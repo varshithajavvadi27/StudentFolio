@@ -1,0 +1,120 @@
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String        @unique
+  password     String
+  createdAt    DateTime      @default(now())
+
+  profile      Profile?
+  education    Education[]
+  projects     Project[]
+  skills       Skill[]
+  achievements Achievement[]
+  portfolio    Portfolio?
+}
+
+model Profile {
+  id             Int      @id @default(autoincrement())
+  userId         Int      @unique
+  fullName       String   @default("")
+  headline       String   @default("")
+  phone          String   @default("")
+  contactEmail String  @default("")
+  city           String   @default("")
+  course         String   @default("")
+  college        String   @default("")
+  graduationYear Int?
+  about          String   @default("")
+  photoUrl       String   @default("")
+  github         String   @default("")
+  linkedin       String   @default("")
+  updatedAt      DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Education {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  degree      String
+  institution String
+  field       String   @default("")
+  startYear   Int?
+  endYear     Int?
+  grade       String   @default("")
+  description String   @default("")
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Project {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  title        String
+  description  String   @default("")
+  technologies String   @default("")
+  github       String   @default("")
+  demo         String   @default("")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Skill {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  name      String
+  category  String   @default("")
+  level     String   @default("Intermediate")
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model Achievement {
+  id             Int      @id @default(autoincrement())
+  userId         Int
+  title          String
+  type           String   @default("Certificate")
+  organization   String   @default("")
+  date           DateTime?
+  description    String   @default("")
+  certificateUrl String   @default("")
+  createdAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  
+}
+model Portfolio{
+  id         Int      @id @default(autoincrement())
+  userId     Int      @unique
+  templateId String   @default("minimal")
+  themeColor String   @default("#183c2c")
+  fontFamily String   @default("Inter")
+  isPublished Boolean @default(false)
+  slug       String?  @unique
+  updatedAt  DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
